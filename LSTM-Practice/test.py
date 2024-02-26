@@ -5,7 +5,7 @@ from tensorflow import keras
 from keras.models import load_model
 
 actions = ['come', 'away', 'spin']
-seq_length = 30
+seq_length = 10
 
 model = load_model('models/model.h5')
 
