@@ -23,10 +23,12 @@ def mp4_to_numpy(mp4_file_path, save_path):
     # 디렉토리 생성
     os.makedirs(save_path, exist_ok=True)
 
-    # 파일로 저장
-    np.save(os.path.join(save_path, '2.np'), video_frames_np)
+    # 파일로 저장 (주석 처리)
+    np.save(os.path.join(save_path, '2.npy'), video_frames_np)
+
+    return video_frames_np
 
 # 사용
-mp4_file_path = 'KakaoTalk_20240301_145519589.mp4'
+mp4_file_path = '2.mp4'
 save_path = 'LSTM-Practice/dataset'
 video_frames = mp4_to_numpy(mp4_file_path, save_path)

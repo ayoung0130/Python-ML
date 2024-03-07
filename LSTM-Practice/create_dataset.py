@@ -4,9 +4,9 @@ import numpy as np
 import time, os
 
 # 수집할 손동작 목록, 시퀀스 길이, 각 동작 할당 시간 설정
-actions = ['come', 'away', 'spin']
+actions = ['0', '1', '2']
 seq_length = 30
-secs_for_action = 10
+secs_for_action = 4
 
 
 # MediaPipe hands model 초기화
@@ -17,35 +17,34 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5)
 
-# 웹캠을 통한 영상 입력 초기화
-cap = cv2.VideoCapture(0)
+# 영상 파일 경로
+video_files = ['dataset/0.mp4', 'dataset/1.mp4', 'dataset/2.mp4']
+
+# 비디오 캡처 객체 생성
+cap = cv2.VideoCapture(video_files)
 
 # 데이터 저장 디렉토리 생성
 created_time = int(time.time())
 os.makedirs('dataset', exist_ok=True)
 
 # 손동작 수집 루프
-while cap.isOpened():
+for video_file in video_files:
     for idx, action in enumerate(actions):
         data = []
 
-        # 웹캠에서 이미지 읽기
-        ret, img = cap.read()
+        # 비디오 캡처 객체 생성
+        cap = cv2.VideoCapture(video_file)
 
-        # 좌우 반전
-        img = cv2.flip(img, 1)
-
-        # 화면에 대기 메시지 표시
-        cv2.putText(img, f'Waiting for collecting {action.upper()} action...', org=(10, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255), thickness=2)
-        cv2.imshow('img', img)
-        cv2.waitKey(3000)
-
-        # 수집 시작 시간 기록
+        # 시퀀스 수집 시작 시간 기록
         start_time = time.time()
 
         # 지정된 시간 동안 수집
         while time.time() - start_time < secs_for_action:
             ret, img = cap.read()
+
+            # 종료 조건
+            if not ret:
+                break
 
             # 이미지 좌우 반전, 색상 변환
             img = cv2.flip(img, 1)
@@ -96,10 +95,6 @@ while cap.isOpened():
 
             # 화면에 이미지 표시
             cv2.imshow('img', img)
-
-            # q 입력시 종료
-            if cv2.waitKey(1) == ord('q'):
-                break
 
         # 수집한 데이터 저장
         data = np.array(data)
