@@ -4,10 +4,9 @@ import numpy as np
 import time, os
 
 # 수집할 손동작 목록, 시퀀스 길이, 각 동작 할당 시간 설정
-actions = ['0', '1', '2']
-seq_length = 30
-secs_for_action = 4
-
+actions = ['come', 'away', 'spin']
+seq_length = 5 # 윈도우의 사이즈
+secs_for_action = 1
 
 # MediaPipe hands model 초기화
 mp_hands = mp.solutions.hands
@@ -17,34 +16,37 @@ hands = mp_hands.Hands(
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5)
 
-# 영상 파일 경로
-video_files = ['dataset/0.mp4', 'dataset/1.mp4', 'dataset/2.mp4']
-
-# 비디오 캡처 객체 생성
-cap = cv2.VideoCapture(video_files)
+# 웹캠을 통한 영상 입력 초기화
+cap = cv2.VideoCapture(0)
 
 # 데이터 저장 디렉토리 생성
 created_time = int(time.time())
-os.makedirs('dataset', exist_ok=True)
+os.makedirs('LSTM-Practice/dataset', exist_ok=True)
 
 # 손동작 수집 루프
-for video_file in video_files:
+count = 0
+while cap.isOpened() and count < 2:
     for idx, action in enumerate(actions):
+
         data = []
 
-        # 비디오 캡처 객체 생성
-        cap = cv2.VideoCapture(video_file)
+        # 웹캠에서 이미지 읽기
+        ret, img = cap.read()
 
-        # 시퀀스 수집 시작 시간 기록
+        # 좌우 반전
+        img = cv2.flip(img, 1)
+
+        # 화면에 대기 메시지 표시
+        cv2.putText(img, f'Waiting for collecting {action.upper()} action...', org=(10, 30), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 255, 255), thickness=2)
+        cv2.imshow('img', img)
+        cv2.waitKey(3000)
+
+        # 수집 시작 시간 기록
         start_time = time.time()
 
         # 지정된 시간 동안 수집
         while time.time() - start_time < secs_for_action:
             ret, img = cap.read()
-
-            # 종료 조건
-            if not ret:
-                break
 
             # 이미지 좌우 반전, 색상 변환
             img = cv2.flip(img, 1)
@@ -69,6 +71,7 @@ for video_file in video_files:
                     # 관절 간의 각도 계산
                     v1 = joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19], :3] # Parent joint
                     v2 = joint[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], :3] # Child joint
+
                     v = v2 - v1 # [20, 3]. 20개 행과 3개 열
 
                     # 벡터 정규화
@@ -88,6 +91,7 @@ for video_file in video_files:
 
                     # 데이터에 랜드마크와 각도 정보 추가
                     d = np.concatenate([joint.flatten(), angle_label])
+
                     data.append(d)
 
                     # 이미지에 랜드마크 그리기
@@ -96,10 +100,14 @@ for video_file in video_files:
             # 화면에 이미지 표시
             cv2.imshow('img', img)
 
+            # q 입력시 종료
+            if cv2.waitKey(1) == ord('q'):
+                break
+
         # 수집한 데이터 저장
         data = np.array(data)
         print(action, data.shape)
-        np.save(os.path.join('dataset', f'raw_{action}_{created_time}'), data)
+        np.save(os.path.join('LSTM-Practice/dataset', f'raw_{action}_{created_time}_{count+1}'), data)
 
         # 시퀀스 데이터 생성
         full_seq_data = []
@@ -108,5 +116,6 @@ for video_file in video_files:
 
         full_seq_data = np.array(full_seq_data)
         print(action, full_seq_data.shape)
-        np.save(os.path.join('dataset', f'seq_{action}_{created_time}'), full_seq_data)
-    break
+        np.save(os.path.join('LSTM-Practice/dataset', f'seq_{action}_{created_time}_{count+1}'), full_seq_data)
+
+    count += 1

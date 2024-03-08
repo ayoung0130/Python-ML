@@ -5,9 +5,9 @@ from tensorflow import keras
 from keras.models import load_model
 
 actions = ['come', 'away', 'spin']
-seq_length = 10
+seq_length = 5
 
-model = load_model('models/model.h5')
+model = load_model('LSTM-Practice/models/model.h5')
 
 # MediaPipe hands model
 mp_hands = mp.solutions.hands
@@ -73,6 +73,7 @@ while cap.isOpened():
             i_pred = int(np.argmax(y_pred))
             conf = y_pred[i_pred]
 
+            # conf 90% 미만일시 제스처 취하지 않은 것으로 판단
             if conf < 0.9:
                 continue
 
@@ -83,6 +84,8 @@ while cap.isOpened():
                 continue
 
             this_action = '?'
+
+            # 마지막 세개의 액션이 모두 같을 때(반복될 때) 유효하다고 판단
             if action_seq[-1] == action_seq[-2] == action_seq[-3]:
                 this_action = action
 

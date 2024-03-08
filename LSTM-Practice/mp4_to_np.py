@@ -1,34 +1,25 @@
-import os
 import cv2
 import numpy as np
 
-def mp4_to_numpy(mp4_file_path, save_path):
-    cap = cv2.VideoCapture(mp4_file_path)
-    
-    frames = []
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        
-        # frame을 numpy 배열로 변환
-        frame_np = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR을 RGB로 변환
-        frames.append(frame_np)
+# 동영상 파일 열기
+cap = cv2.VideoCapture('0.mp4')
 
-    cap.release()
+# 동영상의 프레임 수, 프레임의 너비 및 높이 가져오기
+frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    # NumPy 배열로 변환
-    video_frames_np = np.array(frames)
+# 동영상 프레임을 저장할 빈 numpy 배열을 생성
+buf = np.empty((frameCount, frameHeight, frameWidth, 3), np.dtype('uint8'))
 
-    # 디렉토리 생성
-    os.makedirs(save_path, exist_ok=True)
+# 반복문을 사용하여 각 프레임을 읽고 numpy 배열에 저장
+fc = 0
+ret = True
 
-    # 파일로 저장 (주석 처리)
-    np.save(os.path.join(save_path, '2.npy'), video_frames_np)
+while (fc < frameCount and ret):
+    ret, buf[fc] = cap.read()
+    fc += 1
 
-    return video_frames_np
+# 동영상 파일 닫기
+cap.release()
 
-# 사용
-mp4_file_path = '2.mp4'
-save_path = 'LSTM-Practice/dataset'
-video_frames = mp4_to_numpy(mp4_file_path, save_path)
