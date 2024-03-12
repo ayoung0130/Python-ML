@@ -9,7 +9,7 @@ seq_length = 5
 
 model = load_model('LSTM-Practice/models/model.h5')
 
-# MediaPipe hands model
+# Initialize MediaPipe hands model
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
@@ -39,6 +39,7 @@ while cap.isOpened():
 
     if result.multi_hand_landmarks is not None:
         for res in result.multi_hand_landmarks:
+            # Initialize an array to store landmark data
             joint = np.zeros((21, 4))
             for j, lm in enumerate(res.landmark):
                 joint[j] = [lm.x, lm.y, lm.z, lm.visibility]
@@ -50,7 +51,7 @@ while cap.isOpened():
             # Normalize v
             v = v / np.linalg.norm(v, axis=1)[:, np.newaxis]
 
-            # Get angle using arcos of dot product
+            # 도트 곱의 역순으로 각도 얻기
             angle = np.arccos(np.einsum('nt,nt->n',
                 v[[0,1,2,4,5,6,8,9,10,12,13,14,16,17,18],:], 
                 v[[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19],:])) # [15,]
@@ -68,6 +69,7 @@ while cap.isOpened():
 
             input_data = np.expand_dims(np.array(seq[-seq_length:], dtype=np.float32), axis=0)
 
+            # 모델로 예측 수행
             y_pred = model.predict(input_data).squeeze()
 
             i_pred = int(np.argmax(y_pred))
@@ -77,9 +79,11 @@ while cap.isOpened():
             if conf < 0.9:
                 continue
 
+            # 예측된 action label 얻기
             action = actions[i_pred]
             action_seq.append(action)
 
+            # action seq 완료되지 않았다면 계속 진행
             if len(action_seq) < 3:
                 continue
 

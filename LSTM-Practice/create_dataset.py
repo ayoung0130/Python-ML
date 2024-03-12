@@ -17,7 +17,7 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5)
 
 # 웹캠을 통한 영상 입력 초기화
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('0.npy')
 
 # 데이터 저장 디렉토리 생성
 created_time = int(time.time())
