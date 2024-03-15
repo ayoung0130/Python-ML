@@ -141,7 +141,7 @@ print(action, data.shape)
 np.save(os.path.join(save_video_path, f'raw_{action}_{created_time}'), data)
 
 # 시퀀스 데이터 생성
-seq_length = 5
+seq_length = 5  # 프레임 길이(=윈도우)
 full_seq_data = []
 for seq in range(len(data) - seq_length):
     full_seq_data.append(data[seq:seq + seq_length])
