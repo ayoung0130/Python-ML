@@ -12,9 +12,9 @@ hands = mp_hands.Hands(
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-video_files = ["LSTM-Practice/video/0.mp4"]
-action = "0"
-idx = "1"
+video_files = ["LSTM-Practice/video/1.mp4"]
+action = "1"
+idx = "2"
 created_time = int(time.time())
 
 # 프레임당 시퀀스 길이
@@ -82,8 +82,8 @@ for video_file in video_files:
 
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)
-        # if cv2.waitKey(1) == ord('q'):
-        #         break
+        if cv2.waitKey(1) == ord('q'):
+            break
 
     # 수집한 데이터 저장
     data = np.array(data_hands)
