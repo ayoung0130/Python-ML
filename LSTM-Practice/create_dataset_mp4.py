@@ -12,9 +12,9 @@ hands = mp_hands.Hands(
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-video_files = ["LSTM-Practice/video/1.mp4"]
-action = "1"
-idx = "2"
+video_files = ["LSTM-Practice/video/2.mp4"]
+action = "2"
+idx = "3"
 created_time = int(time.time())
 
 # 프레임당 시퀀스 길이
