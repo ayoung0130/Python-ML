@@ -5,20 +5,14 @@ import os, time
 
 # 미디어 파이프 모델 초기화
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(
-    max_num_hands=2,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5)
+hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-video_files = ["LSTM-Practice/video/2.mp4"]
-action = "2"
-idx = "3"
+action = "0"
+idx = action
+video_files = [f"LSTM-Practice/video/{action}.mp4"]
 created_time = int(time.time())
-
-# 프레임당 시퀀스 길이
-sequence_length = 5
 
 # 데이터 저장 경로
 save_path = "LSTM-Practice/dataset/"
@@ -77,8 +71,8 @@ for video_file in video_files:
 
                     data_hands.append(d)
 
-                    # 손 랜드마크 그리기
-                    mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                # 손 랜드마크 그리기
+                mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)

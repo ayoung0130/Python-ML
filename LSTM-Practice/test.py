@@ -4,26 +4,17 @@ import numpy as np
 from tensorflow import keras
 from keras.models import load_model
 
-actions = ['come', 'away', 'spin']
+actions = ['0', '1', '2']
 seq_length = 5
 
 model = load_model('LSTM-Practice/models/model.h5')
 
-# Initialize MediaPipe hands model
+# 미디어 파이프 모델 초기화
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
-hands = mp_hands.Hands(
-    max_num_hands=1,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5)
+hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 cap = cv2.VideoCapture(0)
-
-# w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-# h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-# fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-# out = cv2.VideoWriter('input.mp4', fourcc, cap.get(cv2.CAP_PROP_FPS), (w, h))
-# out2 = cv2.VideoWriter('output.mp4', fourcc, cap.get(cv2.CAP_PROP_FPS), (w, h))
 
 seq = []
 action_seq = []
