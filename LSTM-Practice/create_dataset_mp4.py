@@ -28,7 +28,8 @@ for video_file in video_files:
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        data_hands = []
+        left_hand_data = []
+        right_hand_data = []
         
         # 랜드마크 검출
         results_hands = hands.process(frame)
