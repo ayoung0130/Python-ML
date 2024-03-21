@@ -35,10 +35,8 @@ for video_file in video_files:
 
         if results_hands.multi_hand_landmarks is not None:
             hand_type = []      # 손의 타입(왼손, 오른속) 저장할 배열 생성
-            if results_hands.multi_handedness:
-                # 손의 타입 인식 결과 저장
-                hand_type = [handedness.classification[0].label for handedness in results_hands.multi_handedness]
-                print(hand_type)
+            # 손의 타입 인식 결과 저장
+            hand_type = [handedness.classification[0].label for handedness in results_hands.multi_handedness]
 
             for idx, hand_landmarks in enumerate(results_hands.multi_hand_landmarks):       # enumerate: 열거하다(인덱스와 값 동시에 가져옴)
                 # 손의 관절 위치와 가시성 정보 저장할 배열 생성
