@@ -68,10 +68,10 @@ for video_file in video_files:
                 d = np.concatenate([joint_hands.flatten(), angle_label])
 
                 # data append
-                if hand_type == "Left":
-                    left_hand_data.append(d)
-                elif hand_type == "Right":
-                    right_hand_data.append(d)
+                # if hand_type == "Left":
+                #     left_hand_data.append(d)
+                # elif hand_type == "Right":
+                #     right_hand_data.append(d)
 
                 # 손 랜드마크 그리기
                 mp_drawing.draw_landmarks(frame, res, mp_hands.HAND_CONNECTIONS)
@@ -89,18 +89,18 @@ for video_file in video_files:
 
     # 왼손 데이터와 오른손 데이터 병합, 저장
     combined_data = np.concatenate([left_hand_data, right_hand_data])
-    # np.save(os.path.join(save_path, f'raw_{action}_{created_time}'), combined_data)
+    np.save(os.path.join(save_path, f'raw_{action}_{created_time}'), combined_data)
     print("comb1", action, combined_data.shape)  # comb 0 (113, 100)
     print("comb2", action, combined_data.shape)
 
-    # # 시퀀스 데이터 저장
-    # seq_length = 5  # 프레임 길이(=윈도우)
-    # full_seq_data = [combined_data[seq:seq + seq_length] for seq in range(len(combined_data) - seq_length)]
-    # full_seq_data = np.array(full_seq_data)
-    # # np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
-    # print("seq", action, full_seq_data.shape)   # seq 0 (108, 5, 100)
+    # 시퀀스 데이터 저장
+    seq_length = 5  # 프레임 길이(=윈도우)
+    full_seq_data = [combined_data[seq:seq + seq_length] for seq in range(len(combined_data) - seq_length)]
+    full_seq_data = np.array(full_seq_data)
+    np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
+    print("seq", action, full_seq_data.shape)   # seq 0 (108, 5, 100)
     
-    # print("Data saved successfully.")
+    print("Data saved successfully.")
 
 # 사용된 함수, 자원 해제
 cap.release()
