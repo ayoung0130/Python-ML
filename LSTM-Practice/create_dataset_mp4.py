@@ -5,11 +5,12 @@ import os, time
 
 # 미디어 파이프 모델 초기화
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.7, min_tracking_confidence=0.7)
+hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.6, min_tracking_confidence=0.6)
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
 action = "0"
+idx = 1
 video_files = [f"LSTM-Practice/video/{action}.mp4"]
 created_time = int(time.time())
 
@@ -20,8 +21,8 @@ for video_file in video_files:
     # 동영상 불러오기
     cap = cv2.VideoCapture(video_file)
 
-    left_hand_data = []     # 왼손 랜드마크의 데이터 배열 생성
-    right_hand_data = []    # 오른손 랜드마크의 데이터 배열 생성
+    left_hand_data = []     # 왼손 데이터 배열 생성
+    right_hand_data = []    # 오른손 데이터 배열 생성
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -32,11 +33,13 @@ for video_file in video_files:
         results_hands = hands.process(frame)    # 랜드마크 검출
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-        if results_hands.multi_hand_landmarks is not None:
-            for idx, res in enumerate(results_hands.multi_hand_landmarks):
+        # 손 검출시
+        if results_hands.multi_hand_landmarks is not None :
+            for res, handedness in zip(results_hands.multi_hand_landmarks, results_hands.multi_handedness):
+                print(len(results_hands.multi_hand_landmarks))
 
                 # 손의 유형 확인
-                hand_type = results_hands.multi_handedness[idx].classification[0].label
+                hand_type = handedness.classification[0].label
 
                 # 손의 관절 위치와 가시성 정보 저장할 배열 생성
                 joint_hands = np.zeros((21, 4))
@@ -68,13 +71,18 @@ for video_file in video_files:
                 d = np.concatenate([joint_hands.flatten(), angle_label])
 
                 # data append
-                # if hand_type == "Left":
-                #     left_hand_data.append(d)
-                # elif hand_type == "Right":
-                #     right_hand_data.append(d)
+                if hand_type == "Left":
+                    left_hand_data.append(d)
+                if hand_type == "Right":
+                    right_hand_data.append(d)
 
                 # 손 랜드마크 그리기
                 mp_drawing.draw_landmarks(frame, res, mp_hands.HAND_CONNECTIONS)
+        
+        # 한 손만 검출 / 검출x
+        else:
+            # 로직 구현
+            print("0")
 
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)
@@ -89,15 +97,14 @@ for video_file in video_files:
 
     # 왼손 데이터와 오른손 데이터 병합, 저장
     combined_data = np.concatenate([left_hand_data, right_hand_data])
-    np.save(os.path.join(save_path, f'raw_{action}_{created_time}'), combined_data)
-    print("comb1", action, combined_data.shape)  # comb 0 (113, 100)
-    print("comb2", action, combined_data.shape)
+    # np.save(os.path.join(save_path, f'raw_{action}_{created_time}'), combined_data)
+    print("comb", action, combined_data.shape)  # comb 0 (113, 100)
 
     # 시퀀스 데이터 저장
     seq_length = 5  # 프레임 길이(=윈도우)
     full_seq_data = [combined_data[seq:seq + seq_length] for seq in range(len(combined_data) - seq_length)]
     full_seq_data = np.array(full_seq_data)
-    np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
+    # np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
     print("seq", action, full_seq_data.shape)   # seq 0 (108, 5, 100)
     
     print("Data saved successfully.")
