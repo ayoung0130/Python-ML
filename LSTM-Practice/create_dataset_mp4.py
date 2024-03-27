@@ -36,7 +36,6 @@ for video_file in video_files:
         # 손 검출시
         if results_hands.multi_hand_landmarks is not None :
             for res, handedness in zip(results_hands.multi_hand_landmarks, results_hands.multi_handedness):
-                print(len(results_hands.multi_hand_landmarks))
 
                 # 손의 유형 확인
                 hand_type = handedness.classification[0].label
@@ -94,12 +93,14 @@ for video_file in video_files:
     rdata = np.array(right_hand_data)
     print("left", action, ldata.shape)  # left 0 (32, 100)
     print("right", action, rdata.shape) # right 0 (81, 100)
+    print(ldata[10])
+    print(rdata[10])
 
     # 왼손 데이터와 오른손 데이터 병합, 저장
     combined_data = np.concatenate([left_hand_data, right_hand_data])
     # np.save(os.path.join(save_path, f'raw_{action}_{created_time}'), combined_data)
     print("comb", action, combined_data.shape)  # comb 0 (113, 100)
-
+    print(combined_data[10])
     # 시퀀스 데이터 저장
     seq_length = 5  # 프레임 길이(=윈도우)
     full_seq_data = [combined_data[seq:seq + seq_length] for seq in range(len(combined_data) - seq_length)]

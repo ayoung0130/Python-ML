@@ -53,6 +53,7 @@ for video_file in video_files:
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results_hands = hands.process(frame)    # 랜드마크 검출
+        results_left_hands = hands.process(frame, handedness='LEFT')
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
         # 손 검출시
