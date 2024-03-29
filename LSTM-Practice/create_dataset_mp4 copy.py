@@ -27,6 +27,9 @@ def angle(joint_hands, idx):
 # 미디어 파이프 모델 초기화
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.6, min_tracking_confidence=0.6)
+
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
@@ -53,6 +56,7 @@ for video_file in video_files:
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results_hands = hands.process(frame)    # 랜드마크 검출
+        results_pose = pose.process(frame)
         results_left_hands = hands.process(frame, handedness='LEFT')
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
@@ -92,14 +96,20 @@ for video_file in video_files:
 
         # # 손 검출 x
         # else :
+                
+        if results_pose.pose_landmarks:
+            joint_pose = np.zeros((33, 4))
+            for j, lm in enumerate(results_pose.pose_landmarks.landmark):
+                joint_pose[j] = [lm.x, lm.y, lm.z, lm.visibility]
             
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)
         if cv2.waitKey(1) == ord('q'):
             break
-print(d_left)   # 이상함
+        
+print(d_left)
 print(d_right)
-# print(hand_data)
+print(hand_data)
 
 # 사용된 함수, 자원 해제
 cap.release()
