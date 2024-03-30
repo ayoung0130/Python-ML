@@ -17,13 +17,6 @@ pose = mp_pose.Pose(
     min_tracking_confidence=0.5
 )
 
-# # MediaPipe face model 초기화
-# mp_face = mp.solutions.face_mesh
-# face = mp_face.FaceMesh(
-#     min_detection_confidence=0.5,
-#     min_tracking_confidence=0.5
-# )
-
 # mp drawing 설정
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles

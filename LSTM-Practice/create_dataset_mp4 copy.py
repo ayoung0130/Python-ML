@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 import os, time
 
-def angle(joint_hands, idx):
+def angleHands(joint_hands, idx):
     # 관절 간의 각도 계산
     v1 = joint_hands[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19], :3] # Parent joint  각 관절은 [x, y, z] 좌표로 표현되므로 :3
     v2 = joint_hands[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], :3] # Child joint
@@ -21,19 +21,37 @@ def angle(joint_hands, idx):
     # 라벨에 각도 정보 추가
     angle_label = np.array([angle], dtype=np.float32)
     angle_label = np.append(angle_label, idx)
+    
+    return angle_label
+
+def anglePose(joint_pose, idx):
+    v1 = joint_pose[[0,0,11,12,13,14,15,16,15,16,15,16,0,0], :3]
+    v2 = joint_pose[[11,12,13,14,15,16,17,18,19,20,21,22,23,24], :3]
+
+    v = v2 - v1
+
+    v = v / np.linalg.norm(v, axis=1)[:, np.newaxis]
+
+    angle = np.arccos(np.einsum('nt,nt->n', v[:-1], v[1:])) # [12,]
+
+    angle = np.degrees(angle)
+
+    angle_label = np.array([angle], dtype=np.float32)
+    angle_label = np.append(angle_label, idx)
 
     return angle_label
 
 # 미디어 파이프 모델 초기화
 mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.6, min_tracking_confidence=0.6)
+hands = mp_hands.Hands(max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 mp_pose = mp.solutions.pose
 pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-action = "0"
+action = "1"
 idx = 1
 video_files = [f"LSTM-Practice/video/{action}.mp4"]
 created_time = int(time.time())
@@ -44,72 +62,127 @@ save_path = "LSTM-Practice/dataset/"
 for video_file in video_files:
     # 동영상 불러오기
     cap = cv2.VideoCapture(video_file)
-
-    hand_data = []
+    
     left_hand_data = []     # 왼손 데이터 배열 생성
     right_hand_data = []    # 오른손 데이터 배열 생성
-
+    pose_data = []          # 포즈 데이터 배열 생성
+    data = []               # 
+    
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results_hands = hands.process(frame)    # 랜드마크 검출
-        results_pose = pose.process(frame)
-        results_left_hands = hands.process(frame, handedness='LEFT')
+        results_hands = hands.process(frame)    # 손 랜드마크 검출
+        results_pose = pose.process(frame)      # 포즈 랜드마크 검출
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
         # 손 검출시
-        if results_hands.multi_hand_landmarks is not None :
-            for res, handedness in zip(results_hands.multi_hand_landmarks, results_hands.multi_handedness) :
+        if results_hands.multi_hand_landmarks is not None:
+            for res in results_hands.multi_hand_landmarks:
+                # 손, 포즈, 전체
+                joint_hands = np.zeros((21, 4))
+                joint_pose = np.zeros((33, 4))
+                joint = np.zeros((21, 4))
 
-                if len(results_hands.multi_hand_landmarks) == 2:    # 두 손 검출
-                    left_joint_hands = np.zeros((21, 4))
-                    right_joint_hands = np.zeros((21, 4))
+                # 모든 관절에 대해 반복
+                for j, lm in enumerate(res.landmark):
+                    joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
+                for j, lm in enumerate(results_pose.pose_landmarks.landmark):
+                    joint_pose[j] = [lm.x, lm.y, lm.z, lm.visibility]
 
-                    for j, lm in enumerate(res.landmark):
-                        # 관절의 x, y, z좌표, 가시성 정보를 배열에 저장
-                        if handedness.classification[0].label == 'Left':
-                            left_joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
-                        else:
-                            right_joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
+                d_hands = np.concatenate([joint_hands.flatten(), angleHands(joint_hands, idx)])
+                d_pose = np.concatenate([joint_pose.flatten(), anglePose(joint_pose, idx)])
 
-                    # 데이터에 랜드마크와 각도 정보 추가
-                    d_left = np.concatenate([left_joint_hands.flatten(), angle(left_joint_hands, idx)])
-                    d_right = np.concatenate([right_joint_hands.flatten(), angle(right_joint_hands, idx)])
+                for j, hands, pose in enumerate(zip(d_hands, d_pose)):
+                    joint[j] = [ (hands[j], pose[j]) ]
+
+                data = joint.flatten()
+
+        #     for res, handedness in zip(results_hands.multi_hand_landmarks, results_hands.multi_handedness) :
+
+        #         # 두 손 검출시
+        #         if len(results_hands.multi_hand_landmarks) == 2: 
                     
-                    # 두 d를 합쳐야함(연결x)
-                    d_combined = np.array(list(zip(d_left, d_right)))
-
-                    # 데이터 append
-                    hand_data.append(d_combined)
+        #             left_joint_hands = np.zeros((21, 4))
+        #             right_joint_hands = np.zeros((21, 4))
                     
+        #             for j, lm in enumerate(res.landmark):
+        #                 # 관절의 x, y, z좌표를 배열에 저장
+        #                 if handedness.classification[0].label == 'Left':
+        #                     left_joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
+        #                 else:
+        #                     right_joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
 
-                # else :  # 한 손만 검출
-                #     if # 왼손 :
-                    
-                #     else # 오른손:
-            
-                # 손 랜드마크 그리기
-                mp_drawing.draw_landmarks(frame, res, mp_hands.HAND_CONNECTIONS)
+        #             # 데이터에 랜드마크와 각도 정보 추가
+        #             d_left = np.concatenate([left_joint_hands.flatten(), angleHands(left_joint_hands, idx)])
+        #             d_right = np.concatenate([right_joint_hands.flatten(), angleHands(right_joint_hands, idx)])
 
+        #             # 데이터 append
+        #             # left_hand_data.append(d_left)
+        #             # right_hand_data.append(d_right)
+        #             data.append([d_left, d_right])
+
+        #         # 한 손만 검출시
+        #         else : 
+        #             joint_hands = np.zeros((21, 4))
+
+        #             for j, lm in enumerate(res.landmark):
+        #                 joint_hands[j] = [lm.x, lm.y, lm.z, lm.visibility]
+
+        #             if handedness.classification[0].label == 'Left':    # 왼손만 검출(오른손 데이터에 0 채우기) :
+        #                 d_left = np.concatenate([joint_hands.flatten(), angleHands(joint_hands, idx)])
+        #                 left_hand_data.append(d_left)
+        #                 right_hand_data.append(np.zeros(d_left.shape))
+        #             else:   # 오른손(왼손 데이터에 0 채우기) :
+        #                 d_right = np.concatenate([joint_hands.flatten(), angleHands(joint_hands, idx)])
+        #                 right_hand_data.append(d_right)
+        #                 left_hand_data.append(np.zeros(d_right.shape))
+                        
+        #         # 손 랜드마크 그리기
+        #         mp_drawing.draw_landmarks(frame, res, mp_hands.HAND_CONNECTIONS)
+        
         # # 손 검출 x
-        # else :
-                
-        if results_pose.pose_landmarks:
-            joint_pose = np.zeros((33, 4))
-            for j, lm in enumerate(results_pose.pose_landmarks.landmark):
-                joint_pose[j] = [lm.x, lm.y, lm.z, lm.visibility]
+        # # else : # 둘 다 0 채우기
+        #     # dummy_data = np.zeros((100,))
+        #     # left_hand_data.append(dummy_data)
+        #     # right_hand_data.append(dummy_data)
+
+        # # 포즈 랜드마크 그리기
+        # mp_drawing.draw_landmarks(frame, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        
+        # # 포즈
+        # joint_pose = np.zeros((33, 4))
+
+        # for j, lm in enumerate(results_pose.pose_landmarks.landmark):
+        #     joint_pose[j] = [lm.x, lm.y, lm.z, lm.visibility]
             
+        # d_pose = np.concatenate([joint_pose.flatten(), anglePose(joint_pose, idx)])
+            
+        # pose_data.append(d_pose)
+
+            
+
+
+
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)
         if cv2.waitKey(1) == ord('q'):
             break
-        
-print(d_left)
-print(d_right)
-print(hand_data)
+
+
+    # lhdata = np.array(left_hand_data)
+    # rhdata = np.array(right_hand_data)
+    # pdata = np.array(pose_data)
+    data = np.array(data)
+
+
+    # print(lhdata.shape)
+    # print(rhdata.shape)
+    # print(pdata.shape)
+    print(data.shape)
+
 
 # 사용된 함수, 자원 해제
 cap.release()
