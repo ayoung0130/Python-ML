@@ -62,12 +62,19 @@ mp_drawing = mp.solutions.drawing_utils
 # 동영상 파일 설정
 action = "부러지다"
 idx = 0
-video_files = ["C:/Users/mshof/Desktop/video/133_부러지다.mp4", "C:/Users/mshof/Desktop/video/1068_부러지다.mp4", "C:/Users/mshof/Desktop/video/3764_부러지다.mp4"]
-seq_length = 30  # 프레임 길이(=윈도우)
+video_files = ["C:/Users/mshof/Desktop/video/3764_부러지다.mp4"]
+seq_length = 10  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
 save_path = "LSTM-Practice/dataset/"
-data = []   # 전체 데이터 저장할 배열 초기화
+
+# 전체 데이터 저장할 배열 초기화
+data = []
+
+# 확인용
+left_hand_data = []
+right_hand_data = []
+pose_data = []
 
 for video_file in video_files:
     # 동영상 불러오기
@@ -123,19 +130,33 @@ for video_file in video_files:
         # 포즈 랜드마크 그리기
         mp_drawing.draw_landmarks(frame, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
+        # 데이터 크기 확인용
+        d_left = np.append((np.concatenate([joint_left_hands.flatten(), angleHands(joint_left_hands)])), idx)
+        d_right = np.append((np.concatenate([joint_right_hands.flatten(), angleHands(joint_right_hands)])), idx)
+        d_pose = np.append((np.concatenate([joint_pose.flatten(), angleHands(joint_pose)])), idx)
+        left_hand_data.append(d_left)
+        right_hand_data.append(d_right)
+        pose_data.append(d_pose)
+
         # 영상을 화면에 표시
         cv2.imshow('MediaPipe', frame)
         if cv2.waitKey(1) == ord('q'):
             break
-    
+
+# 왼손, 오른손, 포즈 데이터 개수 체크
+print("left: ", action, (np.array(left_hand_data)).shape)   # (111, 100)
+print("right: ", action, (np.array(right_hand_data)).shape) # (111, 100)
+print("pose: ", action, (np.array(right_hand_data)).shape)  # (111, 100)     # 수집한 프레임 수 동일
+
+# 넘파이 배열로 생성
 data = np.array(data)
-print("data shape:", action, data.shape)
-print(data[50:53])
+print("data shape: ", action, data.shape)                   # (111, 298)
+print(data[50])
 
 # 시퀀스 데이터 저장
 full_seq_data = [data[seq:seq + seq_length] for seq in range(len(data) - seq_length)]
 full_seq_data = np.array(full_seq_data)
-np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
+# np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
 print("seq data shape:", action, full_seq_data.shape)
 
 # 사용된 함수, 자원 해제
