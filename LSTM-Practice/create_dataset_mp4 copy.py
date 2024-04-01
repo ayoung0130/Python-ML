@@ -28,13 +28,13 @@ def anglePose(joint_pose):
     v2 = joint_pose[[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20], :3]
     # 0, 2, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
     # 0, 1, 2, 3, 4, 5, 6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
-
     v = v2 - v1
 
     v = v / np.linalg.norm(v, axis=1)[:, np.newaxis]
 
-    angle = np.arccos(np.einsum('nt,nt->n', v[:-1], v[1:])) # [15,]
-
+    angle = np.arccos(np.einsum('nt,nt->n',
+        v[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],:], 
+        v[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],:])) # [15,]
     angle = np.degrees(angle)
 
     angle_label = np.array([angle], dtype=np.float32)
@@ -60,9 +60,9 @@ pose_landmark_indices = [0, 2, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-action = "기절"
-idx = 1
-video_files = ["LSTM-Practice/video/155_기절.mp4", "LSTM-Practice/video/988_기절.mp4", "LSTM-Practice/video/5181_기절.mp4"]
+action = "부러지다"
+idx = 0
+video_files = ["C:/Users/mshof/Desktop/video/133_부러지다.mp4", "C:/Users/mshof/Desktop/video/1068_부러지다.mp4", "C:/Users/mshof/Desktop/video/3764_부러지다.mp4"]
 seq_length = 30  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
@@ -73,7 +73,6 @@ for video_file in video_files:
     # 동영상 불러오기
     cap = cv2.VideoCapture(video_file)
     created_time = int(time.time())
-
 
     # 관절 정보 저장할 넘파이 배열 초기화
     joint_left_hands = np.zeros((21, 4))
@@ -108,15 +107,11 @@ for video_file in video_files:
                 else: # blue
                     mp_drawing.draw_landmarks(frame, res, mp_hands.HAND_CONNECTIONS, landmark_drawing_spec=mp_drawing.DrawingSpec(color=(255, 0, 0)))
 
-        # 전체 데이터(joint) 생성
+        # 전체 데이터(joint) 생성, 포즈 -> 지정한 관절에 대해서만 반복
         for j, i in enumerate(pose_landmark_indices):
             plm = results_pose.pose_landmarks.landmark[i]
             joint[j] = np.concatenate([joint_left_hands[j], joint_right_hands[j], [plm.x, plm.y, plm.z, plm.visibility]])
-        
-        # 포즈 -> 지정한 관절에 대해서만 반복
-        for j, i in enumerate(pose_landmark_indices):
-            lm = results_pose.pose_landmarks.landmark[i]
-            joint_pose[j] = [lm.x, lm.y, lm.z, lm.visibility]
+            joint_pose[j] = [plm.x, plm.y, plm.z, plm.visibility]
 
         # 데이터에 전체 랜드마크,각도값,인덱스 추가 (총 데이터 12*21+15*3+1 = 298개)
         d = np.concatenate([joint.flatten(), angleHands(joint_left_hands), angleHands(joint_right_hands), anglePose(joint_pose)])
@@ -135,6 +130,7 @@ for video_file in video_files:
     
 data = np.array(data)
 print("data shape:", action, data.shape)
+print(data[50:53])
 
 # 시퀀스 데이터 저장
 full_seq_data = [data[seq:seq + seq_length] for seq in range(len(data) - seq_length)]
