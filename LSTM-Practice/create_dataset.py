@@ -17,7 +17,7 @@ mp_drawing = mp.solutions.drawing_utils
 # 동영상 파일 설정
 action = "기절"
 idx = 1
-video_files = ["C:/Users/mshof/Desktop/video/155_기절.mp4", "C:/Users/mshof/Desktop/video/988_기절.mp4"]
+video_files = ["C:/Users/mshof/Desktop/video/155_기절.mp4"]
 seq_length = 10  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
@@ -36,6 +36,7 @@ for video_file in video_files:
     # 동영상 불러오기
     cap = cv2.VideoCapture(video_file)
     created_time = int(time.time())
+    # f = 1
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -93,25 +94,19 @@ for video_file in video_files:
 
         ##
         # 데이터 확인용
-        # print(joint_right_hands)
-        # print(angleHands(joint_right_hands))        
-        # d_left = np.append((np.concatenate([joint_left_hands.flatten(), angleHands(joint_left_hands)])), idx)
-        # d_right = np.append((np.concatenate([joint_right_hands.flatten(), angleHands(joint_right_hands)])), idx)
-        # d_pose = np.append((np.concatenate([joint_pose.flatten(), angleHands(joint_pose)])), idx)
-        # left_hand_data.append(d_left)
-        # right_hand_data.append(d_right)
-        # pose_data.append(d_pose)
-
-##
-# 왼손, 오른손, 포즈 데이터 개수 체크. 3764_부러지다
-# print("left: ", action, (np.array(left_hand_data)).shape)   # (111, 100)
-# print("right: ", action, (np.array(right_hand_data)).shape) # (111, 100)
-# print("pose: ", action, (np.array(right_hand_data)).shape)  # (111, 100)     # 수집한 프레임 수 동일
+        # print(f, "번째 프레임:")
+        # print("right\n", joint_right_hands)
+        # print("left\n", joint_left_hands)
+        # # print("\npose\n", joint_pose)
+        # print("right angle\n", angleHands(joint_right_hands))
+        # print("left angle\n", angleHands(joint_left_hands), "\n\n")
+        # # print("\npose angle\n", angleHands(joint_pose))
+        # f += 1
 
 # 넘파이 배열로 생성
 data = np.array(data)
-print("data shape: ", action, data.shape)                   # (111, 298)
-print(data[50])
+print("data shape: ", action, data.shape)
+print("data[20]\n", data[20])
 
 # 시퀀스 데이터 저장
 full_seq_data = [data[seq:seq + seq_length] for seq in range(len(data) - seq_length)]
