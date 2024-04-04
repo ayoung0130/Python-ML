@@ -28,15 +28,15 @@ data = []
 
 ##
 # 확인용
-# left_hand_data = []
-# right_hand_data = []
-# pose_data = []
+left_hand_data = []
+right_hand_data = []
+pose_data = []
 
 for video_file in video_files:
     # 동영상 불러오기
     cap = cv2.VideoCapture(video_file)
     created_time = int(time.time())
-    # f = 1
+    f = 1
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -94,14 +94,15 @@ for video_file in video_files:
 
         ##
         # 데이터 확인용
-        # print(f, "번째 프레임:")
-        # print("right\n", joint_right_hands)
-        # print("left\n", joint_left_hands)
-        # # print("\npose\n", joint_pose)
-        # print("right angle\n", angleHands(joint_right_hands))
-        # print("left angle\n", angleHands(joint_left_hands), "\n\n")
-        # # print("\npose angle\n", angleHands(joint_pose))
-        # f += 1
+        if f==20:
+            print(f, "번째 프레임:")   
+            print("left\n", joint_left_hands)
+            print("right\n", joint_right_hands)
+            print("pose\n", joint_pose)
+            print("left angle\n", angleHands(joint_left_hands))
+            print("right angle\n", angleHands(joint_right_hands))
+            print("pose angle\n", angleHands(joint_pose), "\n\n")
+        f += 1
 
 # 넘파이 배열로 생성
 data = np.array(data)
@@ -111,7 +112,7 @@ print("data[20]\n", data[20])
 # 시퀀스 데이터 저장
 full_seq_data = [data[seq:seq + seq_length] for seq in range(len(data) - seq_length)]
 full_seq_data = np.array(full_seq_data)
-np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
+# np.save(os.path.join(save_path, f'seq_{action}_{created_time}'), full_seq_data)
 print("seq data shape:", action, full_seq_data.shape)
 
 # 사용된 함수, 자원 해제
