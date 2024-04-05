@@ -17,7 +17,7 @@ mp_drawing = mp.solutions.drawing_utils
 # 동영상 파일 설정
 action = "기절"
 idx = 1
-video_files = ["C:/Users/mshof/Desktop/video/155_기절.mp4"]
+video_files = ["C:/Users/_/Desktop/video/1_155_기절(정).avi", "C:/Users/_/Desktop/video/1_574_기절(측).avi"]
 seq_length = 10  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
@@ -28,9 +28,9 @@ data = []
 
 ##
 # 확인용
-left_hand_data = []
-right_hand_data = []
-pose_data = []
+# left_hand_data = []
+# right_hand_data = []
+# pose_data = []
 
 for video_file in video_files:
     # 동영상 불러오기
@@ -94,15 +94,15 @@ for video_file in video_files:
 
         ##
         # 데이터 확인용
-        if f==20:
-            print(f, "번째 프레임:")   
-            print("left\n", joint_left_hands)
-            print("right\n", joint_right_hands)
-            print("pose\n", joint_pose)
-            print("left angle\n", angleHands(joint_left_hands))
-            print("right angle\n", angleHands(joint_right_hands))
-            print("pose angle\n", angleHands(joint_pose), "\n\n")
-        f += 1
+        # if f==20:
+        #     print(f, "번째 프레임:")   
+        #     print("left\n", joint_left_hands)
+        #     print("right\n", joint_right_hands)
+        #     print("pose\n", joint_pose)
+        #     print("left angle\n", angleHands(joint_left_hands))
+        #     print("right angle\n", angleHands(joint_right_hands))
+        #     print("pose angle\n", angleHands(joint_pose), "\n\n")
+        # f += 1
 
 # 넘파이 배열로 생성
 data = np.array(data)
