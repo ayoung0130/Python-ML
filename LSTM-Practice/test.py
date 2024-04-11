@@ -6,7 +6,7 @@ from keras.models import load_model
 from setting import angleHands, anglePose, setVisibility
 
 
-actions = ['부러지다', '기절']
+actions = ['', '']
 seq_length = 10
 
 model = load_model('LSTM-Practice/models/model.h5')
