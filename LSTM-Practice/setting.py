@@ -51,7 +51,7 @@ def anglePose(joint_pose):
 
 
 def setVisibility(x, y, z):
-    # todo 입실론 값 설정
+    # 입실론 값 설정하기
     if x != 0 and y != 0 and z != 0:
         return 1
     elif x == 0 and y == 0 and z == 0:
