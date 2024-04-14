@@ -17,7 +17,7 @@ mp_drawing = mp.solutions.drawing_utils
 # 동영상 파일 설정
 action = "기절"
 idx = 1
-video_files = ["C:/Users/_/Desktop/video/1_155_기절(정).avi", "C:/Users/_/Desktop/video/1_574_기절(측).avi"]
+video_files = ["C:/Users/_/Desktop/video/1_기절(정).avi", "C:/Users/_/Desktop/video/1_기절(측).avi"]
 seq_length = 10  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
