@@ -15,9 +15,11 @@ pose_landmark_indices = [0, 2, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-action = "기절"
+action = "가렵다"
 idx = 1
-video_files = ["C:/Users/_/Desktop/video/1_기절(정).avi", "C:/Users/_/Desktop/video/1_기절(측).avi"]
+video_files = ["C:/Users/_/Desktop/video/1_가렵다(정).avi", "C:/Users/_/Desktop/video/1_가렵다(측).avi",
+               "C:/Users/_/Desktop/video/2_가렵다(정).avi", "C:/Users/_/Desktop/video/2_가렵다(정).avi",
+               "C:/Users/_/Desktop/video/3_가렵다(정).avi", "C:/Users/_/Desktop/video/3_가렵다(정).avi"]
 seq_length = 10  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
