@@ -20,7 +20,7 @@ idx = 1
 video_files = ["C:/Users/_/Desktop/video/1_가렵다(정).avi", "C:/Users/_/Desktop/video/1_가렵다(측).avi",
                "C:/Users/_/Desktop/video/2_가렵다(정).avi", "C:/Users/_/Desktop/video/2_가렵다(정).avi",
                "C:/Users/_/Desktop/video/3_가렵다(정).avi", "C:/Users/_/Desktop/video/3_가렵다(정).avi"]
-seq_length = 10  # 프레임 길이(=윈도우)
+seq_length = 20  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
 save_path = "LSTM-Practice/dataset/"
