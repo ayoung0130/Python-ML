@@ -15,12 +15,12 @@ pose_landmark_indices = [0, 2, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1
 mp_drawing = mp.solutions.drawing_utils
 
 # 동영상 파일 설정
-action = "가렵다"
-idx = 1
-video_files = ["C:/Users/_/Desktop/video/1_가렵다(정).avi", "C:/Users/_/Desktop/video/1_가렵다(측).avi",
-               "C:/Users/_/Desktop/video/2_가렵다(정).avi", "C:/Users/_/Desktop/video/2_가렵다(정).avi",
-               "C:/Users/_/Desktop/video/3_가렵다(정).avi", "C:/Users/_/Desktop/video/3_가렵다(정).avi"]
-seq_length = 10  # 프레임 길이(=윈도우)
+action = "부러지다"
+idx = 2
+video_files = ["C:/Users/mshof/Desktop/video/1_부러지다(정).avi", "C:/Users/mshof/Desktop/video/2_부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/3_부러지다(정).avi", "C:/Users/mshof/Desktop/video/5_부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/7_부러지다(정).avi", "C:/Users/mshof/Desktop/video/8_부러지다(정).avi"]
+seq_length = 30  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
 save_path = "LSTM-Practice/dataset/"
@@ -30,9 +30,9 @@ data = []
 
 ##
 # 확인용
-left_hand_data = []
-right_hand_data = []
-pose_data = []
+# left_hand_data = []
+# right_hand_data = []
+# pose_data = []
 
 for video_file in video_files:
     # 동영상 불러오기
@@ -79,7 +79,7 @@ for video_file in video_files:
             joint[j] = np.concatenate([joint_left_hands[j], joint_right_hands[j], [plm.x, plm.y, plm.z, plm.visibility]])
             joint_pose[j] = [plm.x, plm.y, plm.z, plm.visibility]
 
-        # 데이터에 전체 랜드마크,각도값,인덱스 추가 (총 데이터 12*21+15*3+1 = 298개)
+        # 데이터에 전체 랜드마크,각도값,인덱스 추가 (총 데이터 4*3*21+15*3+1 = 298개)
         d = np.concatenate([joint.flatten(), angleHands(joint_left_hands), angleHands(joint_right_hands), anglePose(joint_pose)])
         d = np.append(d, idx)
         
@@ -96,15 +96,15 @@ for video_file in video_files:
 
         ##
         # 데이터 확인용
-        if f==20:
-            print(f, "번째 프레임:")   
-            print("left\n", joint_left_hands)
-            print("right\n", joint_right_hands)
-            print("pose\n", joint_pose)
-            print("left angle\n", angleHands(joint_left_hands))
-            print("right angle\n", angleHands(joint_right_hands))
-            print("pose angle\n", angleHands(joint_pose), "\n\n")
-        f += 1
+        # if f==20:
+        #     print(f, "번째 프레임:")   
+        #     print("left\n", joint_left_hands)
+        #     print("right\n", joint_right_hands)
+        #     print("pose\n", joint_pose)
+        #     print("left angle\n", angleHands(joint_left_hands))
+        #     print("right angle\n", angleHands(joint_right_hands))
+        #     print("pose angle\n", angleHands(joint_pose), "\n\n")
+        # f += 1
 
 # 넘파이 배열로 생성
 data = np.array(data)
