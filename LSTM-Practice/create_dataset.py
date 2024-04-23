@@ -17,9 +17,12 @@ mp_drawing = mp.solutions.drawing_utils
 # 동영상 파일 설정
 action = "가렵다"
 idx = 0
-video_files = ["C:/Users/mshof/Desktop/video/ID_1/가렵다.avi", "C:/Users/mshof/Desktop/video/ID_2/가렵다.avi",
-               "C:/Users/mshof/Desktop/video/ID_3/가렵다.avi", "C:/Users/mshof/Desktop/video/ID_4/가렵다.avi",
-               "C:/Users/mshof/Desktop/video/ID_5/가렵다.avi", "C:/Users/mshof/Desktop/video/ID_6/가렵다.avi"]
+video_files = ["C:/Users/mshof/Desktop/video/ID_1/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_2/가렵다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_3/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_4/가렵다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_5/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_6/가렵다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_7/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_8/가렵다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_9/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_10/가렵다(정).avi"]
+# video_files = ["LSTM-Practice/resized_videos/가렵다(정).avi"]
 seq_length = 30  # 프레임 길이(=윈도우)
 
 # 데이터 저장 경로
@@ -103,7 +106,7 @@ for video_file in video_files:
 # 넘파이 배열로 생성
 data = np.array(data)
 print("data shape: ", action, data.shape)
-print("data[20]\n", data[20])
+# print("data[20]\n", data[20])
 
 # 시퀀스 데이터 저장
 full_seq_data = [data[seq:seq + seq_length] for seq in range(len(data) - seq_length)]
