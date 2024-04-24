@@ -1,13 +1,13 @@
 import cv2, os
 
-video_files = ["C:/Users/mshof/Desktop/video/ID_1/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_2/가렵다(정).avi",
-               "C:/Users/mshof/Desktop/video/ID_3/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_4/가렵다(정).avi",
-               "C:/Users/mshof/Desktop/video/ID_5/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_6/가렵다(정).avi",
-               "C:/Users/mshof/Desktop/video/ID_7/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_8/가렵다(정).avi",
-               "C:/Users/mshof/Desktop/video/ID_9/가렵다(정).avi", "C:/Users/mshof/Desktop/video/ID_10/가렵다(정).avi",]
+video_files = ["C:/Users/mshof/Desktop/video/ID_1/부러지다(정).avi", "C:/Users/mshof/Desktop/video/ID_2/부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_3/부러지다(정).avi", "C:/Users/mshof/Desktop/video/ID_4/부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_5/부러지다(정).avi", "C:/Users/mshof/Desktop/video/ID_6/부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_7/부러지다(정).avi", "C:/Users/mshof/Desktop/video/ID_8/부러지다(정).avi",
+               "C:/Users/mshof/Desktop/video/ID_9/부러지다(정).avi", "C:/Users/mshof/Desktop/video/ID_10/부러지다(정).avi",]
 
 # 인덱스 0(가렵다), 1(기절), 2(부러지다)
-output_folder = "resized_videos_0"
+output_folder = "resized_videos_2"
 os.makedirs(output_folder, exist_ok=True)
 
 # 너비, 높이 설정
